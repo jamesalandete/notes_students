@@ -1,0 +1,4 @@
+Code,Type Document,Number Document,Full Name,Phone Number,Note 1,Note 2,Note 3,Average
+1,1,1143448321,Jmes,61616,4.0,5.0,4.2,4.4
+2,1,100450,Karo,1996,4.5,5.0,4.0,4.5
+3,2,114865,Erick,121616,2.0,3.0,5.0,3.33
