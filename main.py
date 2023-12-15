@@ -46,6 +46,7 @@ def read_students_from_file():
         listStudents[student_key] = student_info
         lastCode = int(student_data[0])
     newCode = lastCode + 1
+    print(listStudents)
 
 
 def main():
@@ -57,6 +58,7 @@ def main():
   print('\t4 - PROMEDIO MAS ALTO    ')
   print('\t5 - PROMEDIO MAS BAJO    ')
   print('\t6 - PROMEDIO GENERAL    ')
+  print('\t7 - ELIMINAR ESTUDIANTE    ')
   print('\n*****************************************************')
   print('*****************************************************')
 
@@ -109,11 +111,28 @@ def new_student(type_document, number_document, full_name, phone_number):
     newCode = newCode + 1
 
 def updateStudent():
+    global student_selected
     enter = input('\nDesea editar algun estudiante ?, Ingrese "Si" para editar o presine "Enter" para continuar: ')
     if(enter.lower() == 'si'):
         code = int(input('\nIngrese Codigo "Code" del estudiante a editar, solo numeros: '))
-        print_student_table(code)
-        input('Ingrese que desea editar del estudiante: ')
+        if code in listStudents:
+            for k in listStudents.keys():
+                if(int(k) == code): student_selected = int(k)
+            student = listStudents[code]
+            print_student_table(code)
+            print('\n*************** Modificacion de estudiante *******************')
+            print('Se mostrara informacion del estudiante por cada campo.')
+            print('Solo si desea modificar la informacion existe, ingrese nueva informacion y presione "Enter".')
+            print('Si no desea modificar ninguna informacion de ese campo, presionar solamente "Enter" y pasara a la siguiente.')
+            print('*************** Modificacion de estudiante *******************\n')
+            name = input('Nombre de estudiante actual : '+student['full_name']+ ' ')
+            if name != '': listStudents[code]['full_name'] = name
+
+            phone_number = input('Celular del estudiante actual : '+student['phone_number']+ ' ')
+            if phone_number != '': listStudents[code]['phone_number'] = phone_number
+
+            line_modify(student_selected, listStudents[code])
+            input('Modificado con exito, presione "Enter" para continuar...')
 
 def new_note_student():
     global student_selected
@@ -179,12 +198,43 @@ def print_student_table(filter):
 
     print(tabulate(table_data, headers=headers, tablefmt='fancy_grid'))
 
-def line_modify(numero_linea, student_data):
-    nueva_informacion = f"{student_data['code']},{student_data['type_document']},{student_data['number_document']},{student_data['full_name']},{student_data['phone_number']},{student_data['note_1']},{student_data['note_2']},{student_data['note_3']},{student_data['average']}\n"
+def line_modify(number_line, student_data):
+    number_line = int(number_line) - 1
+    if(number_line == 0): number_line = 1
+    new_information = f"{student_data['code']},{student_data['type_document']},{student_data['number_document']},{student_data['full_name']},{student_data['phone_number']},{student_data['note_1']},{student_data['note_2']},{student_data['note_3']},{student_data['average']}\n"
     with open('students.txt', 'r') as file:
         lines = file.readlines()
-    numero_linea = int(numero_linea)
-    lines[numero_linea] = nueva_informacion
+    number_line = int(number_line)
+    lines[number_line] = new_information
 
     with open('students.txt', 'w') as file:
         file.writelines(lines)
+
+def deleteStudent():
+    global student_selected
+
+    print_student_table(0)
+    codeStudent = int(input("Ingrese codigo del estudiante a eliminar: "))
+    if codeStudent in listStudents:
+        for k in listStudents.keys():
+            if(int(k) == codeStudent): student_selected = int(k)
+    new_file = "temp.txt"
+    try:
+        student_data = listStudents[codeStudent]
+        line_delete = f"{student_data['code']},{student_data['type_document']},{student_data['number_document']},{student_data['full_name']},{student_data['phone_number']},{student_data['note_1']},{student_data['note_2']},{student_data['note_3']},{student_data['average']}\n"
+        # Lee el archivo y escribe las líneas que no deseas eliminar en el nuevo archivo
+        with open('students.txt', 'r') as original_file, open(new_file, 'w') as file_new:
+            for line in original_file:
+                print(line)
+                if line != line_delete:
+                    file_new.write(line)
+
+        # Renombra el nuevo archivo para que tenga el mismo nombre que el original
+        os.replace(new_file, 'students.txt')
+        del listStudents[codeStudent]
+        print(f" Estudiante eliminado.")
+        input('Presione "Enter" para continuar...')
+    except FileNotFoundError:
+        print(f"El archivo 'students.txt' no existe.")
+    except Exception as e:
+        print(f"Error al intentar eliminar la línea: {e}")

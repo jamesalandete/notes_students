@@ -39,6 +39,8 @@ while exit:
         Imain.average_student('min')
     elif opcion == 6:
         Imain.average_general()
+    elif opcion == 7:
+        Imain.deleteStudent()
     else:
         print("Escoja una opcion valida")
         enter = input("Escriba 'Salir' para terminar o 'Volver' para ir al inicio: ")
